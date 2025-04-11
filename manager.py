@@ -73,7 +73,7 @@ while True:
             rayon = 2
         else:
             msg = "🌑 Everything is dark..."
-            extra_msg = "❄️ It's freezing out there..."
+            extra_msg = "❄️  It's freezing out there..."
             rayon = 1
 
             if not torch_active:
