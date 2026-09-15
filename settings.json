@@ -1,0 +1,19 @@
+{
+  "walk_speed": 4.0,
+  "mouse_sensitivity": 38.0,
+  "eye_height": 2.0,
+  "gravity": 1.0,
+  "jump_height": 1.5,
+  "chunk_size": 20.0,
+  "chunk_radius": 2,
+  "compute_radius": 3,
+  "trees_per_chunk": 14,
+  "fog_calm": 0.045,
+  "fog_max": 0.11,
+  "fog_torch": 0.03,
+  "torch_seconds": 45.0,
+  "cold_start": 0.35,
+  "cold_period": 9.0,
+  "path_length": 900.0,
+  "torch_pickup_chance": 0.08
+}

@@ -1,5 +1,9 @@
+import json
 import os
 import random
+import subprocess
+import sys
+import time
 from forest import generer_foret
 from house import generer_maison
 
@@ -50,6 +54,35 @@ def est_valide(carte, x, y):
         return carte[y][x] in ["🟫", "🏚️", "🚪", "  ", "📦"]
     return False
 
+# Passage a la phase 3D
+def lancer_3d():
+    with open("save.json", "w", encoding="utf-8") as f:
+        json.dump({"hp": hp, "inventory": inventory}, f, ensure_ascii=False)
+
+    os.system('cls' if os.name == 'nt' else 'clear')
+    for ligne in ["...", "The path ends here.", "But the forest doesn't."]:
+        print(ligne)
+        time.sleep(1.8)
+
+    subprocess.run([sys.executable, "forest3d.py", "save.json"])
+
+# Mode test : python manager.py --skip (ou -s) saute directement la 2D
+# et lance la 3D. Par defaut : 10 HP, inventaire vide.
+# --torch (ou -t), repetable, ajoute une torche par occurrence.
+# --torch=N ajoute N torches d'un coup. On peut cumuler les deux.
+if "--skip" in sys.argv or "-s" in sys.argv:
+    for arg in sys.argv:
+        if arg in ("--torch", "-t"):
+            inventory.append("🕯️")
+        elif arg.startswith("--torch="):
+            try:
+                n = int(arg.split("=", 1)[1])
+            except ValueError:
+                n = 0
+            inventory.extend(["🕯️"] * max(0, n))
+    lancer_3d()
+    sys.exit(0)
+
 # Boucle principale
 while True:
     extra_msg = None
@@ -89,12 +122,12 @@ while True:
     else:
         afficher(carte_maison, vision_limitee=True, rayon=2, hp=hp, inventory=inventory)
 
-    move = input("Déplace-toi (z/q/s/d), l = light torch : ").lower()
+    move = input("\nDéplacement : (Z/W) haut, (S) bas, (Q/A) gauche, (D) droite — (L) allumer une torche : ").lower()
     new_x, new_y = player_x, player_y
 
-    if move == "z": new_y -= 1
+    if move in ("z", "w"): new_y -= 1
     elif move == "s": new_y += 1
-    elif move == "q": new_x -= 1
+    elif move in ("q", "a"): new_x -= 1
     elif move == "d": new_x += 1
     elif move == "l":
         if "🕯️" in inventory:
@@ -113,6 +146,11 @@ while True:
 
         if etat == "foret":
             move_counter += 1
+
+        # Fin du sentier : bascule en 3D
+        if etat == "foret" and player_x >= LARGEUR - 1:
+            lancer_3d()
+            break
 
         # Entrer dans une maison
         if etat == "foret" and current_carte[player_y][player_x] == "🏚️":
